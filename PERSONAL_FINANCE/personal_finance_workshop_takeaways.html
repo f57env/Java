@@ -1,0 +1,398 @@
+
+<style>
+  :root { --tab-active: var(--color-background-primary); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+
+  .header { padding: 1.5rem 0 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+  .header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tab-btn {
+    padding: 6px 14px; border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    font-size: 13px; cursor: pointer; transition: all 0.15s;
+  }
+  .tab-btn:hover { background: var(--color-background-primary); color: var(--color-text-primary); }
+  .tab-btn.active { background: var(--color-background-primary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+
+  .book-panel { display: none; }
+  .book-panel.active { display: block; }
+
+  .book-meta { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); }
+  .book-badge { width: 48px; height: 48px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .book-meta-text h2 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .book-meta-text p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+
+  .section { margin-bottom: 1.5rem; }
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .card-num { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .card-body { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+  .highlight-box { border-left: 2px solid; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 10px 14px; margin-bottom: 8px; }
+  .highlight-box .label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+  .highlight-box .text { font-size: 13px; line-height: 1.6; }
+  .hb-green { border-color: #1D9E75; background: #E1F5EE; color: #085041; }
+  .hb-green .label { color: #0F6E56; }
+  .hb-amber { border-color: #BA7517; background: #FAEEDA; color: #633806; }
+  .hb-amber .label { color: #854F0B; }
+  .hb-red { border-color: #A32D2D; background: #FCEBEB; color: #501313; }
+  .hb-red .label { color: #791F1F; }
+  .hb-blue { border-color: #185FA5; background: #E6F1FB; color: #042C53; }
+  .hb-blue .label { color: #0C447C; }
+  .hb-purple { border-color: #534AB7; background: #EEEDFE; color: #26215C; }
+  .hb-purple .label { color: #3C3489; }
+
+  @media (prefers-color-scheme: dark) {
+    .hb-green { background: #04342C; color: #9FE1CB; }
+    .hb-green .label { color: #5DCAA5; }
+    .hb-amber { background: #412402; color: #FAC775; }
+    .hb-amber .label { color: #EF9F27; }
+    .hb-red { background: #501313; color: #F7C1C1; }
+    .hb-red .label { color: #F09595; }
+    .hb-blue { background: #042C53; color: #B5D4F4; }
+    .hb-blue .label { color: #85B7EB; }
+    .hb-purple { background: #26215C; color: #CECBF6; }
+    .hb-purple .label { color: #AFA9EC; }
+  }
+
+  .workshop-tip { background: var(--color-background-info); color: var(--color-text-info); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 13px; line-height: 1.6; margin-bottom: 8px; }
+  .workshop-tip strong { font-weight: 500; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 100px; font-weight: 500; margin-right: 4px; margin-bottom: 4px; }
+  .tag-teal { background: #9FE1CB; color: #04342C; }
+  .tag-coral { background: #F5C4B3; color: #4A1B0C; }
+  .tag-purple { background: #CECBF6; color: #26215C; }
+  .tag-amber { background: #FAC775; color: #412402; }
+  @media (prefers-color-scheme: dark) {
+    .tag-teal { background: #085041; color: #9FE1CB; }
+    .tag-coral { background: #712B13; color: #F5C4B3; }
+    .tag-purple { background: #3C3489; color: #CECBF6; }
+    .tag-amber { background: #633806; color: #FAC775; }
+  }
+</style>
+
+<div class="header">
+  <h1>Personal finance workshop — book takeaways</h1>
+  <p>Key insights for your Rotaract workshop presentation</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('psych')">Psychology of Money</button>
+  <button class="tab-btn" onclick="showTab('simple')">Simple Path to Wealth</button>
+  <button class="tab-btn" onclick="showTab('rich')">I Will Teach You to Be Rich</button>
+  <button class="tab-btn" onclick="showTab('total')">Total Money Makeover</button>
+</div>
+
+<!-- BOOK 1 -->
+<div id="psych" class="book-panel active">
+  <div class="book-meta">
+    <div class="book-badge" style="background:#EEEDFE;">📖</div>
+    <div class="book-meta-text">
+      <h2>The Psychology of Money — Morgan Housel (2020)</h2>
+      <p>Explores how emotions, biases, and behaviour shape financial decisions more than spreadsheets ever will. 19 short essays on wealth, greed, and happiness.</p>
+      <div style="margin-top:8px;">
+        <span class="tag tag-purple">Mindset</span>
+        <span class="tag tag-purple">Behaviour</span>
+        <span class="tag tag-purple">Long-term thinking</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Core themes</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-num">01</div>
+        <div class="card-title">No one is crazy</div>
+        <div class="card-body">Everyone's financial decisions make sense to them based on their unique lived experiences. What looks irrational to you may be perfectly logical from their background and history.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <div class="card-title">Luck and risk are siblings</div>
+        <div class="card-body">Success and failure are far less about skill than we assume. Be humble about your wins and compassionate about others' losses — both are partly outside personal control.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <div class="card-title">Never enough</div>
+        <div class="card-body">The most dangerous financial goal is chasing "more" with no finish line. Knowing when you have enough is one of the most valuable things money can teach you.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">04</div>
+        <div class="card-title">Compounding is counterintuitive</div>
+        <div class="card-body">Warren Buffett's $81B net worth came after age 65. The real secret isn't returns — it's time. Starting early matters infinitely more than picking the right stock.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">05</div>
+        <div class="card-title">Getting wealthy vs staying wealthy</div>
+        <div class="card-body">Building wealth requires optimism and risk-taking. Keeping wealth requires paranoia and humility. The skills are almost opposite — you need both simultaneously.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">06</div>
+        <div class="card-title">Tails drive everything</div>
+        <div class="card-body">A small number of events account for the majority of outcomes. Accept that you'll be wrong most of the time — the few wins just need to be big enough to cover the losses.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">07</div>
+        <div class="card-title">Freedom is the real dividend</div>
+        <div class="card-body">The highest form of wealth is the ability to control your own time. Money buys options, not happiness — but options over your schedule are as close to happiness as money gets.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">08</div>
+        <div class="card-title">Save without a goal</div>
+        <div class="card-body">Saving for retirement, college, or a house is fine. But saving just to have flexibility is even better — life's biggest opportunities and crises are always unplanned.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">09</div>
+        <div class="card-title">Room for error</div>
+        <div class="card-body">The most important part of any plan is planning for the plan not going perfectly. A margin of safety is not pessimism — it's the only rational response to an uncertain future.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Workshop presentation angles</div>
+    <div class="workshop-tip"><strong>Activity idea:</strong> Ask the audience "What financial advice did your parents give you?" — use Housel's "no one is crazy" lens to show how everyone's money story is shaped by their upbringing.</div>
+    <div class="workshop-tip"><strong>Slide stat:</strong> Buffett compound chart — show his net worth by decade. 99% was earned after age 50. Let the visual do the talking.</div>
+    <div class="workshop-tip"><strong>Discussion prompt:</strong> "What would you do differently with your money if you had enough already?" Opens the "never enough" conversation naturally.</div>
+  </div>
+</div>
+
+<!-- BOOK 2 -->
+<div id="simple" class="book-panel">
+  <div class="book-meta">
+    <div class="book-badge" style="background:#E1F5EE;">📗</div>
+    <div class="book-meta-text">
+      <h2>The Simple Path to Wealth — JL Collins (2016)</h2>
+      <p>Distilled from blog posts written for his daughter. Argues that index fund investing is the most reliable, lowest-cost path to financial independence for ordinary people.</p>
+      <div style="margin-top:8px;">
+        <span class="tag tag-teal">Index investing</span>
+        <span class="tag tag-teal">FI/RE</span>
+        <span class="tag tag-teal">Low cost</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Core principles</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-num">01</div>
+        <div class="card-title">Avoid debt — all of it</div>
+        <div class="card-body">Debt is a "f*** you" money destroyer. Collins is blunt: avoid consumer debt entirely. Carrying a credit card balance while trying to invest is like filling a leaking bucket.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <div class="card-title">Spend less than you earn</div>
+        <div class="card-body">The single most powerful financial move. A high income with poor spending habits still leads to financial fragility. Your savings rate matters more than your salary.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <div class="card-title">Invest the difference in VTSAX</div>
+        <div class="card-body">VTSAX (Vanguard Total Stock Market Index Fund) is the hero of this book. Broad market, ultra-low cost, globally diversified — Collins says this one fund is all most people ever need.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">04</div>
+        <div class="card-title">The stock market will fluctuate</div>
+        <div class="card-body">Corrections and crashes are guaranteed. But over every 20-year period in history, the US market has been positive. Stop watching the market — it's irrelevant to long-term investors.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">05</div>
+        <div class="card-title">The wealth accumulation phase</div>
+        <div class="card-body">During working years: 100% equities. Ignore the noise. Reinvest dividends automatically. The only action needed is to keep buying regardless of market conditions.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">06</div>
+        <div class="card-title">The wealth preservation phase</div>
+        <div class="card-body">As retirement nears, shift some allocation to bonds (VBTLX). Not for returns, but for emotional stability — bonds reduce the gut-punch of downturns so you don't panic-sell at the worst time.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">07</div>
+        <div class="card-title">The 4% rule</div>
+        <div class="card-body">Withdraw 4% of your portfolio per year in retirement and historically your money won't run out in 30 years. 25× your annual expenses = your FI number. Simple, usable, empowering.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">08</div>
+        <div class="card-title">F*** you money</div>
+        <div class="card-body">Collins' philosophy: accumulate enough assets that you never need to tolerate a bad boss, bad job, or bad situation. Financial independence gives you leverage in all of life's negotiations.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Workshop presentation angles</div>
+    <div class="workshop-tip"><strong>Calculator demo:</strong> Show the FI number formula live — Annual expenses × 25. For ₹4L/year expenses, the FI number is ₹1 crore. Make it tangible for Indian audiences.</div>
+    <div class="workshop-tip"><strong>Key insight to emphasise:</strong> The simplicity IS the strategy. Collins' core message is that complexity in investing usually benefits the advisor, not the investor.</div>
+    <div class="workshop-tip"><strong>India context:</strong> Map VTSAX to Nifty 50 index funds (UTI/SBI/HDFC Nifty 50 index fund) — same philosophy, local execution. This grounds the theory for your audience.</div>
+  </div>
+</div>
+
+<!-- BOOK 3 -->
+<div id="rich" class="book-panel">
+  <div class="book-meta">
+    <div class="book-badge" style="background:#FAEEDA;">💰</div>
+    <div class="book-meta-text">
+      <h2>I Will Teach You to Be Rich — Ramit Sethi (2009, revised 2019)</h2>
+      <p>A no-nonsense, slightly irreverent 6-week action plan for 20-somethings to automate their finances, eliminate bad debt, and start investing — without giving up lattes.</div>
+      <div style="margin-top:8px;">
+        <span class="tag tag-amber">Automation</span>
+        <span class="tag tag-amber">Millennials</span>
+        <span class="tag tag-amber">Action-first</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">6-week action framework</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-num">Week 1</div>
+        <div class="card-title">Optimise your credit cards</div>
+        <div class="card-body">Credit cards aren't evil — bad financial habits are. Set up autopay to pay the full balance monthly. Call and negotiate lower APR. Earn points. Use them as a free tool.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Week 2</div>
+        <div class="card-title">Open the right accounts</div>
+        <div class="card-body">Move to a high-yield savings account and a no-fee checking account. Banks charge billions in hidden fees. Stop letting them. These two moves alone can save thousands over time.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Week 3</div>
+        <div class="card-title">Open an investment account</div>
+        <div class="card-body">Open a Roth IRA (401k equivalent). Even if you can only put ₹500/month in. The account being open and active is far more important than the amount at this stage.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Week 4</div>
+        <div class="card-title">Conscious spending plan</div>
+        <div class="card-body">Sethi hates traditional budgets. Instead: fixed costs (50–60%), investments (10%), savings (5–10%), guilt-free spending (20–35%). Spend lavishly on what you love, cut ruthlessly on what you don't.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Week 5</div>
+        <div class="card-title">Automate everything</div>
+        <div class="card-body">The system should run without you. Salary arrives → rent/bills auto-deducted → investment auto-transferred → remainder is guilt-free to spend. No willpower required, no spreadsheet monitoring.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Week 6</div>
+        <div class="card-title">Invest in index funds</div>
+        <div class="card-body">Target-date funds or a simple 3-fund portfolio. Set it, automate contributions, and ignore it for 30 years. Time in the market beats timing the market — always.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Standout ideas</div>
+    <div class="highlight-box hb-green">
+      <div class="label">The latte fallacy</div>
+      <div class="text">Sethi pushes back against the "skip your coffee to get rich" trope. Small cuts don't move the needle. Big wins — negotiating salary, lowering rent, automating investing — do. Focus there.</div>
+    </div>
+    <div class="highlight-box hb-blue">
+      <div class="label">The automation system</div>
+      <div class="text">The entire book's practical output is one diagram: the "conscious spending" money flow. Build this once and it runs your finances for life without willpower or discipline.</div>
+    </div>
+    <div class="highlight-box hb-amber">
+      <div class="label">Negotiate everything</div>
+      <div class="text">Sethi includes actual scripts to negotiate salary, bank fees, and credit card APR. Most people don't ask — those who do save thousands. The ask costs nothing.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Workshop presentation angles</div>
+    <div class="workshop-tip"><strong>Audience fit:</strong> This book is perfect for college students and first-jobbers. The tone is conversational, the steps are concrete, and the time commitment is 6 weeks — very relevant for a Rotaract crowd.</div>
+    <div class="workshop-tip"><strong>Activity:</strong> Draw the "conscious spending" money flow on a whiteboard live. Let attendees map their own income through it in real time — instant takeaway they can act on that evening.</div>
+  </div>
+</div>
+
+<!-- BOOK 4 -->
+<div id="total" class="book-panel">
+  <div class="book-meta">
+    <div class="book-badge" style="background:#FCEBEB;">🏦</div>
+    <div class="book-meta-text">
+      <h2>The Total Money Makeover — Dave Ramsey (2003)</h2>
+      <p>A structured, debt-elimination-first programme built around 7 sequential "Baby Steps". Emphasises discipline, behaviour change, and getting out of debt before investing.</p>
+      <div style="margin-top:8px;">
+        <span class="tag tag-coral">Debt elimination</span>
+        <span class="tag tag-coral">Baby steps</span>
+        <span class="tag tag-coral">Discipline</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">The 7 baby steps</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-num">Step 1</div>
+        <div class="card-title">₹1,000 starter emergency fund</div>
+        <div class="card-body">Before anything else, save a small buffer so a flat tyre doesn't derail your entire plan. This isn't your full emergency fund — it's just a firewall against small setbacks while you attack debt.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Step 2</div>
+        <div class="card-title">Debt snowball — all non-mortgage debt</div>
+        <div class="card-body">List all debts smallest to largest. Pay minimums on everything except the smallest — throw everything at that. When it's gone, roll the freed-up payment to the next. Momentum is the mechanism.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Step 3</div>
+        <div class="card-title">Full emergency fund (3–6 months)</div>
+        <div class="card-body">Once debt-free (except home), build a proper emergency fund covering 3–6 months of expenses in a liquid savings account. This is your financial immune system.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Step 4</div>
+        <div class="card-title">Invest 15% into retirement</div>
+        <div class="card-body">Now — only now — start building wealth. Invest 15% of household income in retirement accounts. Ramsey recommends equity mutual funds (growth, growth-and-income, aggressive growth, international).</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Step 5</div>
+        <div class="card-title">College funding for children</div>
+        <div class="card-body">Education savings for children starts here — not before retirement investing is in place. Use education savings plans or equivalent local vehicles.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Step 6</div>
+        <div class="card-title">Pay off your home early</div>
+        <div class="card-body">Throw all extra income at the mortgage. Ramsey is passionate about owning your home outright — the psychological and financial freedom of a zero-debt life is his North Star.</div>
+      </div>
+      <div class="card">
+        <div class="card-num">Step 7</div>
+        <div class="card-title">Build wealth and give generously</div>
+        <div class="card-body">With no debt and no mortgage, every rupee of income is available to build wealth and change your family's legacy. Ramsey emphasises generosity as the ultimate goal of financial success.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Strengths and limitations</div>
+    <div class="highlight-box hb-green">
+      <div class="label">What it does brilliantly</div>
+      <div class="text">The Baby Steps system is remarkably effective for people in serious debt. The psychological "snowball" (smallest debt first, not highest interest) generates real momentum and behaviour change. It works because it's emotionally intelligent, not just mathematically optimal.</div>
+    </div>
+    <div class="highlight-box hb-amber">
+      <div class="label">Where it oversimplifies</div>
+      <div class="text">Ramsey categorically avoids all investing until Step 4, which can cost years of compound growth. His blanket rejection of credit cards also ignores their benefits for responsible users. The system is designed for people in financial crisis — not necessarily optimal for those who aren't.</div>
+    </div>
+    <div class="highlight-box hb-red">
+      <div class="label">Criticisms from the personal finance community</div>
+      <div class="text">Mathematically, paying highest-interest debt first (avalanche method) beats the snowball method. Ramsey's mutual fund recommendations often have high fees. His insurance and real estate advice has drawn controversy. Use the framework, not every specific product recommendation.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Workshop presentation angles</div>
+    <div class="workshop-tip"><strong>Best for:</strong> Audience members carrying student loans, credit card debt, or personal loans. The Baby Steps give immediate, actionable clarity — "what do I do first?"</div>
+    <div class="workshop-tip"><strong>Debate framing:</strong> Present both Ramsey's snowball and the avalanche method side-by-side. Let the audience weigh in on which they'd choose — great engagement moment and no wrong answer.</div>
+    <div class="workshop-tip"><strong>Key quote to open with:</strong> Ramsey's central idea — "Live like no one else today so that later you can live like no one else." Good hook for a workshop on delayed gratification.</div>
+  </div>
+</div>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.book-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
